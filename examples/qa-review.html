@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QA Review — пример отчёта</title>
+<style>
+:root{
+  --bg:#FAF9F5; --surface:#FFFFFF; --surface-2:#F1EFE7; --line:#E6E2D6;
+  --ink:#15161F; --ink-2:#4C4E5C; --ink-3:#8A8B99;
+  --accent:#B38A00; --accent-bg:#FFF6CC;
+  --blocker:#B3241F; --blocker-bg:#FAEAE8; --blocker-line:#F0C7C3;
+  --critical:#B25E06; --critical-bg:#FBF0E2; --critical-line:#EFD3A8;
+  --medium:#2E51C9; --medium-bg:#ECF0FC; --medium-line:#C9D3F5;
+  --low:#5C5F6E; --low-bg:#F0EFEB; --low-line:#DAD8CE;
+  --working:#1B7A50; --working-bg:#E7F5EE; --working-line:#BFE4D2;
+  --sans:system-ui,sans-serif;
+  --mono:ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#111111; --surface:#1B1B1B; --surface-2:#242424; --line:#343434;
+    --ink:#F2F2F2; --ink-2:#C8C8C8; --ink-3:#8E8E8E;
+    --accent:#FFE100; --accent-bg:#2B2600;
+    --blocker:#FF7A72; --blocker-bg:#3A1418; --blocker-line:#5C2126;
+    --critical:#FFB258; --critical-bg:#3A2408; --critical-line:#5C3B0E;
+    --medium:#8FA3FF; --medium-bg:#161C40; --medium-line:#2C3670;
+    --low:#B4B6CC; --low-bg:#26262B; --low-line:#3A3A42;
+    --working:#63D9A6; --working-bg:#0F3327; --working-line:#1C5240;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111111; --surface:#1B1B1B; --surface-2:#242424; --line:#343434;
+  --ink:#F2F2F2; --ink-2:#C8C8C8; --ink-3:#8E8E8E;
+  --accent:#FFE100; --accent-bg:#2B2600;
+  --blocker:#FF7A72; --blocker-bg:#3A1418; --blocker-line:#5C2126;
+  --critical:#FFB258; --critical-bg:#3A2408; --critical-line:#5C3B0E;
+  --medium:#8FA3FF; --medium-bg:#161C40; --medium-line:#2C3670;
+  --low:#B4B6CC; --low-bg:#26262B; --low-line:#3A3A42;
+  --working:#63D9A6; --working-bg:#0F3327; --working-line:#1C5240;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;padding-inline:20px;padding-block:36px 64px}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+.wrap{max-width:1440px;margin:0 auto}
+.mono{font-family:var(--mono)}
+
+/* header */
+.head{display:flex;flex-direction:column;gap:14px;margin-bottom:28px}
+.eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.head h1{font-size:clamp(28px,5vw,38px);font-weight:800;line-height:1.08;letter-spacing:-0.01em}
+.head p.sub{margin:0;font-size:15.5px;line-height:1.55;color:var(--ink-2);max-width:72ch}
+.metarow{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.metachip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:var(--surface-2);border:1px solid var(--line);font-size:12.5px;color:var(--ink-2);font-weight:500}
+.metachip b{color:var(--ink);font-weight:600}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:26px 0 34px}
+.stat{border-radius:14px;padding:14px 12px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:2px}
+.stat .n{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.stat .l{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3)}
+.stat.blocker{border-color:var(--blocker-line);background:var(--blocker-bg)}.stat.blocker .n{color:var(--blocker)}
+.stat.critical{border-color:var(--critical-line);background:var(--critical-bg)}.stat.critical .n{color:var(--critical)}
+.stat.medium{border-color:var(--medium-line);background:var(--medium-bg)}.stat.medium .n{color:var(--medium)}
+.stat.low{border-color:var(--low-line);background:var(--low-bg)}.stat.low .n{color:var(--low)}
+.stat.working{border-color:var(--working-line);background:var(--working-bg)}.stat.working .n{color:var(--working)}
+@media (max-width:640px){.stats{grid-template-columns:repeat(3,1fr)}}
+
+/* journey */
+.journey{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-size:13px;color:var(--ink-2);margin-bottom:40px}
+.journey b{color:var(--ink);font-weight:700}
+.journey .arrow{color:var(--ink-3)}
+
+/* sections */
+.section{margin-bottom:46px}
+.section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--ink)}
+.section-head h2{font-size:19px;font-weight:800}
+.section-head .count{font-size:12.5px;color:var(--ink-3);font-weight:600}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:#fff}
+.chip.blocker{background:var(--blocker)}
+.chip.critical{background:var(--critical)}
+.chip.medium{background:var(--medium)}
+.chip.low{background:var(--low)}
+:root[data-theme="dark"] .chip{color:#111}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip{color:#111}}
+
+/* findings table */
+.tblbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tblbtn{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);padding:7px 14px;border-radius:99px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.tblbtn .n{font-variant-numeric:tabular-nums;opacity:.65}
+.tblbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tblbtn.active{color:#fff;border-color:transparent}
+.tblbtn.active[data-f="all"]{background:var(--ink);color:var(--bg)}
+.tblbtn.active[data-f="blocker"]{background:var(--blocker)}
+.tblbtn.active[data-f="critical"]{background:var(--critical)}
+.tblbtn.active[data-f="medium"]{background:var(--medium)}
+.tblbtn.active[data-f="low"]{background:var(--low)}
+.bugtable-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+.bugtable{width:100%;table-layout:fixed;border-collapse:collapse;min-width:1360px;background:var(--surface)}
+.bugtable thead th{text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);padding:12px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+.bugtable tbody tr{border-bottom:1px solid var(--line)}
+.bugtable tbody tr:last-child{border-bottom:none}
+.bugtable tbody tr.hide{display:none}
+.bugtable td{padding:16px 14px;vertical-align:top}
+.bugtable td.idcell{border-left:3px solid var(--line);overflow-wrap:break-word}
+.bugtable tr[data-sev="blocker"] td.idcell{border-left-color:var(--blocker)}
+.bugtable tr[data-sev="critical"] td.idcell{border-left-color:var(--critical)}
+.bugtable tr[data-sev="medium"] td.idcell{border-left-color:var(--medium)}
+.bugtable tr[data-sev="low"] td.idcell{border-left-color:var(--low)}
+.bugtable .rid{display:block;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--ink)}
+.bugtable .rtc{display:block;margin-top:3px;font-size:10.5px;color:var(--ink-3)}
+.bugtable td.shotcell svg.mock{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line);background:var(--surface-2)}
+.bugtable td.shotcell .shotcap{margin-top:6px;font-size:10.5px;color:var(--ink-3)}
+.bugtable .crumb{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin-bottom:5px}
+.bugtable .issuecell h4{margin:0 0 6px;font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.32}
+.bugtable .issuecell p{margin:0 0 8px;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.bugtable .qbox{font-style:italic;font-size:12px;line-height:1.5;color:var(--ink-2);border-left:2px solid var(--line);padding-left:9px}
+.bugtable .fixcell .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);margin:0 0 3px}
+.bugtable .fixcell .lbl:not(:first-child){margin-top:11px}
+.bugtable .fixcell p{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.bugtable .scorecell .chip{display:inline-flex;margin-bottom:7px}
+.bugtable .catchip{display:inline-flex;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:6px;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
+
+/* mock frame colours */
+.m-a{fill:var(--surface)} .m-b{fill:var(--line)} .m-c{fill:var(--ink-3);opacity:.45}
+.m-k{fill:var(--accent)} .m-mk{fill:none;stroke:var(--blocker);stroke-width:3}
+.m-dash{fill:none;stroke:var(--ink-3);stroke-width:2;stroke-dasharray:5 4;opacity:.7}
+
+/* works */
+.working-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wcard{border:1px solid var(--working-line);background:var(--working-bg);border-radius:12px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.wcard svg{flex:none;margin-top:2px;color:var(--working)}
+.wcard div{font-size:13.5px;line-height:1.5;color:var(--ink)}
+.wcard b{display:block;font-size:13.5px;margin-bottom:2px}
+@media (max-width:640px){.working-grid{grid-template-columns:1fr}}
+
+.foot{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style></head>
+<body>
+
+<!-- Кадры-заглушки: в реальном отчёте здесь скриншоты из видео по тайм-коду -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="m-form" viewBox="0 0 200 140">
+    <rect class="m-a" width="200" height="140"/>
+    <rect class="m-b" x="16" y="14" width="80" height="10" rx="5"/>
+    <rect class="m-b" x="16" y="36" width="168" height="22" rx="7"/>
+    <rect class="m-b" x="16" y="66" width="168" height="22" rx="7"/>
+    <rect class="m-c" x="16" y="100" width="168" height="24" rx="8"/>
+    <circle class="m-mk" cx="164" cy="112" r="13"/>
+  </symbol>
+  <symbol id="m-lobby" viewBox="0 0 200 140">
+    <rect class="m-a" width="200" height="140"/>
+    <rect class="m-b" x="12" y="10" width="176" height="16" rx="6"/>
+    <rect class="m-b" x="12" y="36" width="54" height="40" rx="8"/><rect class="m-b" x="73" y="36" width="54" height="40" rx="8"/><rect class="m-b" x="134" y="36" width="54" height="40" rx="8"/>
+    <rect class="m-b" x="12" y="84" width="54" height="40" rx="8"/><rect class="m-b" x="73" y="84" width="54" height="40" rx="8"/><rect class="m-b" x="134" y="84" width="54" height="40" rx="8"/>
+    <rect class="m-k" x="28" y="50" width="22" height="12" rx="6"/>
+    <circle class="m-mk" cx="39" cy="56" r="16"/>
+  </symbol>
+  <symbol id="m-limit" viewBox="0 0 200 140">
+    <rect class="m-a" width="200" height="140"/>
+    <rect class="m-b" x="16" y="14" width="96" height="10" rx="5"/>
+    <rect class="m-b" x="16" y="52" width="168" height="8" rx="4"/>
+    <circle class="m-k" cx="16" cy="56" r="10"/>
+    <rect class="m-b" x="16" y="84" width="90" height="12" rx="6"/>
+    <rect class="m-c" x="16" y="108" width="168" height="20" rx="8"/>
+    <circle class="m-mk" cx="70" cy="90" r="18"/>
+  </symbol>
+  <symbol id="m-promo" viewBox="0 0 200 140">
+    <rect class="m-a" width="200" height="140"/>
+    <rect class="m-b" x="16" y="14" width="90" height="10" rx="5"/>
+    <rect class="m-dash" x="16" y="36" width="168" height="24" rx="8"/>
+    <rect class="m-k" x="16" y="70" width="168" height="24" rx="8"/>
+    <rect class="m-b" x="16" y="104" width="168" height="10" rx="5"/>
+    <rect class="m-b" x="16" y="120" width="168" height="10" rx="5"/>
+    <circle class="m-mk" cx="164" cy="48" r="13"/>
+  </symbol>
+  <symbol id="m-search" viewBox="0 0 200 140">
+    <rect class="m-a" width="200" height="140"/>
+    <rect class="m-b" x="16" y="14" width="168" height="24" rx="12"/>
+    <rect class="m-c" x="28" y="23" width="44" height="6" rx="3"/>
+    <rect class="m-dash" x="36" y="56" width="128" height="62" rx="10"/>
+    <circle class="m-mk" cx="100" cy="87" r="16"/>
+  </symbol>
+  <symbol id="m-date" viewBox="0 0 200 140">
+    <rect class="m-a" width="200" height="140"/>
+    <rect class="m-b" x="12" y="12" width="90" height="10" rx="5"/>
+    <rect class="m-b" x="12" y="36" width="176" height="22" rx="6"/><rect class="m-b" x="12" y="66" width="176" height="22" rx="6"/><rect class="m-b" x="12" y="96" width="176" height="22" rx="6"/>
+    <rect class="m-c" x="20" y="43" width="46" height="8" rx="4"/><rect class="m-c" x="20" y="73" width="46" height="8" rx="4"/><rect class="m-c" x="20" y="103" width="46" height="8" rx="4"/>
+    <circle class="m-mk" cx="43" cy="47" r="20"/>
+  </symbol>
+  <symbol id="m-footer" viewBox="0 0 200 140">
+    <rect class="m-a" width="200" height="140"/>
+    <rect class="m-b" x="16" y="18" width="110" height="8" rx="4"/>
+    <rect class="m-b" x="16" y="34" width="80" height="8" rx="4"/>
+    <rect class="m-c" x="16" y="82" width="30" height="20" rx="4"/><rect class="m-c" x="54" y="86" width="22" height="14" rx="4"/><rect class="m-c" x="84" y="78" width="38" height="26" rx="4"/><rect class="m-c" x="130" y="84" width="26" height="18" rx="4"/><rect class="m-c" x="164" y="80" width="20" height="24" rx="4"/>
+    <circle class="m-mk" cx="100" cy="92" r="46"/>
+  </symbol>
+</svg>
+
+<div class="wrap">
+
+  <div class="head">
+    <div class="eyebrow">QA · Mobile · пример</div>
+    <h1>QA Review: пример отчёта</h1>
+    <p class="sub">Так выглядит QA-таблица, которую скилл watch собирает по записям прохождения: сводка, фильтр по критичности, у каждой находки кадр, тайм-код, цитата тестировщика, ожидание и предложение. Данные в этом файле вымышлены.</p>
+    <div class="metarow">
+      <span class="metachip">📱 <b>Мобильная версия</b></span>
+      <span class="metachip">🗓 <b>26.09.2026</b></span>
+      <span class="metachip">🎬 <b>Video 1</b> — 18:20</span>
+      <span class="metachip">🎬 <b>Video 2</b> — 21:00</span>
+      <span class="metachip">⏱ <b>39:20</b> общая длительность</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat blocker"><span class="n">1</span><span class="l">Блокер</span></div>
+    <div class="stat critical"><span class="n">3</span><span class="l">Критично</span></div>
+    <div class="stat medium"><span class="n">2</span><span class="l">Средне</span></div>
+    <div class="stat low"><span class="n">1</span><span class="l">Низко</span></div>
+    <div class="stat working"><span class="n">2</span><span class="l">Работает</span></div>
+  </div>
+
+  <div class="journey">
+    <b>Путь тестирования:</b> регистрация <span class="arrow">→</span> лобби <span class="arrow">→</span> поиск игры <span class="arrow">→</span> профиль и лимиты (video 1) <span class="arrow">→</span> касса и промокод <span class="arrow">→</span> история транзакций <span class="arrow">→</span> футер (video 2)
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>🧭 Находки</h2><span class="count">7 находок · фильтр по критичности</span></div>
+
+    <div class="tblbar">
+      <button class="tblbtn active" data-f="all" onclick="bugFilter('all',this)">Все <span class="n">7</span></button>
+      <button class="tblbtn" data-f="blocker" onclick="bugFilter('blocker',this)">🛑 Блокер <span class="n">1</span></button>
+      <button class="tblbtn" data-f="critical" onclick="bugFilter('critical',this)">🔴 Критично <span class="n">3</span></button>
+      <button class="tblbtn" data-f="medium" onclick="bugFilter('medium',this)">🟡 Средне <span class="n">2</span></button>
+      <button class="tblbtn" data-f="low" onclick="bugFilter('low',this)">⚪️ Низко <span class="n">1</span></button>
+    </div>
+
+    <div class="bugtable-wrap">
+      <table class="bugtable">
+        <colgroup>
+          <col style="width:100px"><col style="width:250px"><col style="width:400px"><col style="width:320px"><col style="width:140px">
+        </colgroup>
+        <thead>
+          <tr><th>№</th><th>Экран</th><th>Что не так</th><th>Что сделать</th><th>Оценка</th></tr>
+        </thead>
+        <tbody id="bugtbody">
+
+          <tr data-sev="blocker">
+            <td class="idcell"><span class="rid">B01</span><span class="rtc mono">Video 1 · 03:12</span></td>
+            <td class="shotcell"><svg class="mock" viewBox="0 0 200 140" role="img" aria-label="Кадр 03:12"><use href="#m-form"/></svg><div class="shotcap mono">кадр 03:12</div></td>
+            <td class="issuecell">
+              <div class="crumb">Регистрация</div>
+              <h4>Кнопка «Далее» не активна при корректных данных</h4>
+              <p>Все поля заполнены, ошибок нет, но кнопка остаётся серой. Помогает только перезагрузка страницы, после неё данные приходится вводить заново.</p>
+              <div class="qbox">«Я всё ввёл, а оно не пускает дальше»</div>
+            </td>
+            <td class="fixcell">
+              <div class="lbl">Ожидание</div>
+              <p>Кнопка активна, как только форма валидна.</p>
+              <div class="lbl">Что сделать</div>
+              <p>Проверить условие активации кнопки: возможно, поля, заполненные браузером автоматически, не считаются заполненными.</p>
+            </td>
+            <td class="scorecell"><span class="chip blocker">Блокер</span><span class="catchip">Функционал</span></td>
+          </tr>
+
+          <tr data-sev="critical">
+            <td class="idcell"><span class="rid">C01</span><span class="rtc mono">Video 1 · 02:14 и 09:40</span></td>
+            <td class="shotcell"><svg class="mock" viewBox="0 0 200 140" role="img" aria-label="Кадр 02:14"><use href="#m-lobby"/></svg><div class="shotcap mono">кадр 02:14</div></td>
+            <td class="issuecell">
+              <div class="crumb">Лобби</div>
+              <h4>Кнопка «Играть» срабатывает только со второго нажатия</h4>
+              <p>С первого раза ничего не происходит, игра открывается после повторного нажатия. Повторилось дважды за запись.</p>
+              <div class="qbox">«Нажимаю “Играть” — ничего не происходит»</div>
+            </td>
+            <td class="fixcell">
+              <div class="lbl">Ожидание</div>
+              <p>Игра открывается с первого нажатия, пока грузится, виден индикатор.</p>
+              <div class="lbl">Что сделать</div>
+              <p>Проверить обработчик нажатия и добавить индикатор загрузки на кнопку.</p>
+            </td>
+            <td class="scorecell"><span class="chip critical">Критично</span><span class="catchip">Функционал</span></td>
+          </tr>
+
+          <tr data-sev="critical">
+            <td class="idcell"><span class="rid">C02</span><span class="rtc mono">Video 1 · 09:05</span></td>
+            <td class="shotcell"><svg class="mock" viewBox="0 0 200 140" role="img" aria-label="Кадр 09:05"><use href="#m-limit"/></svg><div class="shotcap mono">кадр 09:05</div></td>
+            <td class="issuecell">
+              <div class="crumb">Профиль · лимиты</div>
+              <h4>Лимит депозита не сохраняется</h4>
+              <p>Значение выставили и подтвердили. После обновления страницы лимит снова показан как «не задан».</p>
+              <div class="qbox">«Поставил лимит, обновил — а его нет»</div>
+            </td>
+            <td class="fixcell">
+              <div class="lbl">Ожидание</div>
+              <p>Лимит сохраняется и виден после перезагрузки.</p>
+              <div class="lbl">Что сделать</div>
+              <p>Проверить запись лимита на сервере и показывать подтверждение «Лимит сохранён».</p>
+            </td>
+            <td class="scorecell"><span class="chip critical">Критично</span><span class="catchip">Функционал</span></td>
+          </tr>
+
+          <tr data-sev="critical">
+            <td class="idcell"><span class="rid">C03</span><span class="rtc mono">Video 2 · 12:05</span></td>
+            <td class="shotcell"><svg class="mock" viewBox="0 0 200 140" role="img" aria-label="Кадр 12:05"><use href="#m-promo"/></svg><div class="shotcap mono">кадр 12:05</div></td>
+            <td class="issuecell">
+              <div class="crumb">Касса</div>
+              <h4>Не видно, сработал ли промокод</h4>
+              <p>После ввода поле просто очищается: ни сообщения, ни бонуса в списке. Игрок не понимает, применился ли код, и вводит его повторно.</p>
+              <div class="qbox">«Ввёл код — и всё. Он вообще сработал?»</div>
+            </td>
+            <td class="fixcell">
+              <div class="lbl">Ожидание</div>
+              <p>Результат виден сразу: бонус применён или причина отказа.</p>
+              <div class="lbl">Что сделать</div>
+              <p>Показать статус под полем и добавить применённый бонус в раздел «Мои бонусы».</p>
+            </td>
+            <td class="scorecell"><span class="chip critical">Критично</span><span class="catchip">Коммуникация</span></td>
+          </tr>
+
+          <tr data-sev="medium">
+            <td class="idcell"><span class="rid">M01</span><span class="rtc mono">Video 2 · 06:40</span></td>
+            <td class="shotcell"><svg class="mock" viewBox="0 0 200 140" role="img" aria-label="Кадр 06:40"><use href="#m-search"/></svg><div class="shotcap mono">кадр 06:40</div></td>
+            <td class="issuecell">
+              <div class="crumb">Лобби</div>
+              <h4>Поиск не находит игру по части названия</h4>
+              <p>По слову целиком игра находится, по началу названия показан пустой экран без подсказки.</p>
+              <div class="qbox">«Ищу игру по части названия — поиск молчит»</div>
+            </td>
+            <td class="fixcell">
+              <div class="lbl">Ожидание</div>
+              <p>Поиск работает по части названия, при пустом результате есть понятное сообщение.</p>
+              <div class="lbl">Что сделать</div>
+              <p>Включить поиск по подстроке и показать пустое состояние с подсказкой.</p>
+            </td>
+            <td class="scorecell"><span class="chip medium">Средне</span><span class="catchip">UX</span></td>
+          </tr>
+
+          <tr data-sev="medium">
+            <td class="idcell"><span class="rid">M02</span><span class="rtc mono">Video 2 · 15:30</span></td>
+            <td class="shotcell"><svg class="mock" viewBox="0 0 200 140" role="img" aria-label="Кадр 15:30"><use href="#m-date"/></svg><div class="shotcap mono">кадр 15:30</div></td>
+            <td class="issuecell">
+              <div class="crumb">Кабинет</div>
+              <h4>Формат даты в истории транзакций отличается от остального сайта</h4>
+              <p>В истории даты вида 09/26/2026, в остальных разделах 26.09.2026.</p>
+            </td>
+            <td class="fixcell">
+              <div class="lbl">Ожидание</div>
+              <p>Один формат даты во всём интерфейсе.</p>
+              <div class="lbl">Что сделать</div>
+              <p>Привести историю к формату, принятому в остальных разделах.</p>
+            </td>
+            <td class="scorecell"><span class="chip medium">Средне</span><span class="catchip">Контент</span></td>
+          </tr>
+
+          <tr data-sev="low">
+            <td class="idcell"><span class="rid">L01</span><span class="rtc mono">Video 2 · 18:10</span></td>
+            <td class="shotcell"><svg class="mock" viewBox="0 0 200 140" role="img" aria-label="Кадр 18:10"><use href="#m-footer"/></svg><div class="shotcap mono">кадр 18:10</div></td>
+            <td class="issuecell">
+              <div class="crumb">Футер</div>
+              <h4>Иконки платёжных систем разного размера</h4>
+              <p>Иконки в ряду отличаются по высоте и стоят не на одной линии.</p>
+            </td>
+            <td class="fixcell">
+              <div class="lbl">Ожидание</div>
+              <p>Иконки одного размера и на одной линии.</p>
+              <div class="lbl">Что сделать</div>
+              <p>Привести к единой сетке.</p>
+            </td>
+            <td class="scorecell"><span class="chip low">Низко</span><span class="catchip">UX</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>✅ Работает хорошо</h2><span class="count">стоит закрепить, не трогать при рефакторинге</span></div>
+    <div class="working-grid">
+      <div class="wcard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <div><b>Оплата картой</b>Подтверждение платежа в банке проходит без зависаний, деньги зачисляются сразу (video 2, 13:20).</div>
+      </div>
+      <div class="wcard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <div><b>Подтверждение e-mail</b>Письмо приходит за несколько секунд, ссылка ведёт в профиль (video 1, 01:30).</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Пример из репозитория скилла watch · данные вымышлены</span>
+    <span>7 находок · 2 записи · 39:20</span>
+  </div>
+
+</div>
+
+<script>
+function bugFilter(sev, btn){
+  document.querySelectorAll('.tblbtn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('#bugtbody tr').forEach(function(row){
+    row.classList.toggle('hide', sev !== 'all' && row.dataset.sev !== sev);
+  });
+}
+</script>
+</body></html>
