@@ -24,7 +24,7 @@ Claude Code сам по себе не видит видео. Скилл `watch` 
 ### Способ 1. Одна команда
 
 ```bash
-git clone https://github.com/jenyacaseapple-png/watch-skill.git ~/.claude/skills/watch
+git clone https://github.com/jenyacaseapple-png/watch-igaming.git ~/.claude/skills/watch
 bash ~/.claude/skills/watch/install.sh --deps
 ```
 
@@ -33,8 +33,8 @@ bash ~/.claude/skills/watch/install.sh --deps
 ### Способ 2. Скрипт из скачанного репозитория
 
 ```bash
-git clone https://github.com/jenyacaseapple-png/watch-skill.git
-cd watch-skill
+git clone https://github.com/jenyacaseapple-png/watch-igaming.git
+cd watch-igaming
 ./install.sh --deps
 ```
 
@@ -45,7 +45,7 @@ cd watch-skill
 Откройте Claude Code и вставьте:
 
 ```text
-Установи скилл watch из https://github.com/jenyacaseapple-png/watch-skill :
+Установи скилл watch из https://github.com/jenyacaseapple-png/watch-igaming :
 1. Склонируй репозиторий в ~/.claude/skills/watch. Если такая папка уже есть, спроси меня, что делать.
 2. Проверь, что стоят yt-dlp, ffmpeg и whisper. Чего не хватает, покажи команды установки и спроси разрешение.
 3. Скажи, когда закончишь, и что мне написать для проверки.
